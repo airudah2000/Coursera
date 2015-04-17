@@ -13,6 +13,11 @@ abstract class QuickCheckHeap extends Properties("Heap") with IntHeap {
     val h = insert(a, empty)
     findMin(h) == a
   }
+//
+//  property("deleteMin1") = forAll { h: H =>
+//    val resultantHeap = if(isEmpty(h)) empty else deleteMin(h)
+//    !h.equals(resultantHeap)
+//  }
 
   lazy val genHeap: Gen[H] = ???
 
