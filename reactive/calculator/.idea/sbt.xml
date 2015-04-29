@@ -7,7 +7,6 @@
         <option name="jdk" value="1.8" />
         <option name="resolveClassifiers" value="true" />
         <option name="resolveSbtClassifiers" value="true" />
-        <option name="sbtVersion" value="0.13.7" />
         <option name="useAutoImport" value="true" />
       </SbtProjectSettings>
     </option>
