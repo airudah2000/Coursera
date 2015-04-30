@@ -7,6 +7,15 @@ import org.scalatest._
 import TweetLength.MaxTweetLength
 import Polynomial._
 import Calculator._
+import Signal._
+
+sealed abstract class Expr
+final case class Literal(v: Double) extends Expr
+final case class Ref(name: String) extends Expr
+final case class Plus(a: Expr, b: Expr) extends Expr
+final case class Minus(a: Expr, b: Expr) extends Expr
+final case class Times(a: Expr, b: Expr) extends Expr
+final case class Divide(a: Expr, b: Expr) extends Expr
 
 @RunWith(classOf[JUnitRunner])
 class CalculatorSuite extends FunSuite with ShouldMatchers {
@@ -70,28 +79,33 @@ class CalculatorSuite extends FunSuite with ShouldMatchers {
   }
 
   test("Calculate expression literal") {
-//    abstract class Expr
-//    case class Literal(v: Double) extends Expr
-//
-//    def getReferenceExpr(name: String, references: Map[String, Signal[Expr]]): Expr = {
-//      references.get(name).fold[Expr] {
-//        Literal(Double.NaN)
-//      } { exprSignal =>
-//        exprSignal()
-//      }
-//    }
-//
-//    val namedExpressionsA: Map[String, Nothing] = (List("a", "b") zip List(Signal(Literal(2)), Signal(Literal(3)))).toMap
-//    val (key1, val1) = namedExpressions.head
-//    val exp1 = getReferenceExpr(key1, namedExpressions)
-//
-//    val (key2, val2) = namedExpressions.tail
-//    val exp2 = getReferenceExpr(key2, namedExpressions)
-//
-//    val namedExpressionsB: Map[String, Nothing] = (List("a", "b") zip List(Signal(exp1), Signal(exp2))).toMap
-//
-//    val computedValues1 = computeValues(Map(key1, Signal(namedExpressions)))
-//    assert(computedValues1 === 1, s"values were $computedValues")
+    val names = (0 until 10).map(i => ('a' + i).toChar.toString)
+    val literalValue = Literal(2)
+    assert(literalValue.v === 2.toDouble, "I don't know what literal is: " + literalValue.v)
+
+  }
+
+  test("Return a literal value") {
+    val litVal = Literal(2)
+    val namedExpression: Map[String, Signal[Expr]] = Map("a" -> Signal(litVal))
+    System.out.print(namedExpression.map(_._2.toString))
   }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
