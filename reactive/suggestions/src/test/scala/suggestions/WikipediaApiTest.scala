@@ -34,7 +34,7 @@ class WikipediaApiTest extends FunSuite {
   import mockApi._
 
   test("WikipediaApi should make the stream valid using sanitized") {
-    val notvalid = Observable.just("erik", "erik meijer", "martin")
+    val notvalid: Observable[String] = Observable.just("erik", "erik meijer", "martin")
     val valid = notvalid.sanitized
 
     var count = 0

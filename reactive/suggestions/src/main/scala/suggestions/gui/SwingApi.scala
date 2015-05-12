@@ -56,8 +56,9 @@ trait SwingApi {
       Observable.create(
         observer => {
           field subscribe {
-            case ValueChanged(tf) =>
-              observer.onNext(tf.text)
+            case ValueChanged(tf) => observer.onNext(tf.text)
+            case x: Throwable     => observer.onError(x)
+            case _                => observer.onCompleted()
           }
           Subscription(field)
         })

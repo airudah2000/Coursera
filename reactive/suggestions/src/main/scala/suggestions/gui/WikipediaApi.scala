@@ -9,7 +9,7 @@ import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{ Try, Success, Failure }
 import rx.subscriptions.CompositeSubscription
-import rx.lang.scala.Observable
+import rx.lang.scala.{Observer, Subscription, Observable}
 import observablex._
 import search._
 
@@ -37,7 +37,19 @@ trait WikipediaApi {
      *
      * E.g. `"erik", "erik meijer", "martin` should become `"erik", "erik_meijer", "martin"`
      */
-    def sanitized: Observable[String] = ???
+    def sanitized: Observable[String] =
+      Observable.create(
+        observer => {
+          obs subscribe new Observer[String] {
+            override def onNext(m: String) = if (m.contains(" ")) m.replaceAll(" ", "_") else m.toString
+
+            override def onError(e: Throwable) = println("oops: " + e.getMessage)
+
+            override def onCompleted() = println("Completed!")
+          }
+        }
+
+      )
 
   }
 
