@@ -77,6 +77,16 @@ class SwingApiTest extends FunSuite {
       observed += _
     }
 
+    // augmented: add a second subscription that records errors and completion
+    val observed2 = mutable.Buffer[String]()
+
+    def onNext(s: String) = observed2 += s
+    def onErr(t: Throwable) = observed2 += t.getMessage
+    def onComp() = observed2 += "Completed!"
+
+    // sub2 also writes errors and completions to its list of strings
+    val sub2 = values subscribe(onNext, onErr, onComp)
+
     // write some text now
     textField.text = "T"
     textField.text = "Tu"
@@ -86,6 +96,7 @@ class SwingApiTest extends FunSuite {
     textField.text = "Turing"
 
     assert(observed == Seq("T", "Tu", "Tur", "Turi", "Turin", "Turing"), observed)
+    assert(observed2 == Seq("T", "Tu", "Tur", "Turi", "Turin", "Turing"), observed2)
   }
 
 }
