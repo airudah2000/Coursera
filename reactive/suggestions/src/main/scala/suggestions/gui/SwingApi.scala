@@ -53,13 +53,14 @@ trait SwingApi {
       */
 
     def textValues: Observable[String] =
-      Observable.create(observer => {
-        field subscribe {
-          case ValueChanged(tf) =>
+      Observable.create(
+        observer => {
+          field subscribe {
+            case ValueChanged(tf) =>
               observer.onNext(tf.text)
-        }
-        Subscription(field)
-      })
+          }
+          Subscription(field)
+        })
   }
 
   implicit class ButtonOps(button: Button) {
