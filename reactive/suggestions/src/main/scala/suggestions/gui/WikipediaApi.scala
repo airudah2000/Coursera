@@ -9,7 +9,7 @@ import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{ Try, Success, Failure }
 import rx.subscriptions.CompositeSubscription
-import rx.lang.scala.{Observer, Subscription, Observable}
+import rx.lang.scala.{Subscription, Observer, Observable}
 import observablex._
 import search._
 
@@ -37,19 +37,8 @@ trait WikipediaApi {
      *
      * E.g. `"erik", "erik meijer", "martin` should become `"erik", "erik_meijer", "martin"`
      */
-    def sanitized: Observable[String] =
-      Observable.create(
-        observer => {
-          obs subscribe new Observer[String] {
-            override def onNext(m: String) = if (m.contains(" ")) m.replaceAll(" ", "_") else m.toString
 
-            override def onError(e: Throwable) = println("oops: " + e.getMessage)
-
-            override def onCompleted() = println("Completed!")
-          }
-        }
-
-      )
+    def sanitized: Observable[String] = obs.map(_.replace(' ', '_'))
 
   }
 
@@ -60,7 +49,7 @@ trait WikipediaApi {
      *
      * E.g. `1, 2, 3, !Exception!` should become `Success(1), Success(2), Success(3), Failure(Exception), !TerminateStream!`
      */
-    def recovered: Observable[Try[T]] = ???
+    def recovered: Observable[Try[T]] = obs.map(x => if(x.isInstanceOf[Exception]) Failure(x.asInstanceOf[Exception]) else Success(x))
 
     /** Emits the events from the `obs` observable, until `totalSec` seconds have elapsed.
      *
@@ -68,7 +57,7 @@ trait WikipediaApi {
      *
      * Note: uses the existing combinators on observables.
      */
-    def timedOut(totalSec: Long): Observable[T] = ???
+    def timedOut(totalSec: Long): Observable[T] = obs.takeUntil(Observable.interval(totalSec.seconds))
 
     /** Given a stream of events `obs` and a method `requestMethod` to map a request `T` into
      * a stream of responses `S`, returns a stream of all the responses wrapped into a `Try`.
@@ -95,7 +84,12 @@ trait WikipediaApi {
      *
      * Observable(Success(1), Succeess(1), Succeess(1), Succeess(2), Succeess(2), Succeess(2), Succeess(3), Succeess(3), Succeess(3))
      */
-    def concatRecovered[S](requestMethod: T => Observable[S]): Observable[Try[S]] = ???
+    def concatRecovered[S](requestMethod: T => Observable[S]): Observable[Try[S]] = {
+//      obs.map(x => if(x.asInstanceOf[Exception]) Failure(new Exception) else Success(x))
+//      requestMethod.toObservable.map(x => if(x.asInstanceOf[Exception]) Failure(new Exception) else Success(x))
+//      obs.map(x => requestMethod. (y => if(y.isInstanceOf[Exception]) Failure(new Throwable) else Success(y)))
+      obs.flatMap(requestMethod(_).recovered)
+    }
 
   }
 
